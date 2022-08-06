@@ -4,7 +4,7 @@ import (
 	"sync"
 )
 
-var thread = 15
+var thread = 10
 
 // TODO
 // to test the difference location of wg

@@ -10,6 +10,7 @@ type Conf struct {
 	FofaToken    string
 	QuakeToken   string
 	DnsgrepToken string
+	HunterApiKey string
 }
 
 func InitConf() *Conf {
@@ -26,6 +27,7 @@ func InitConf() *Conf {
 	conf.FofaToken = viper.GetStringMapString("fofa")["fofatoken"]
 	conf.QuakeToken = viper.GetStringMapString("quake")["quaketoken"]
 	conf.DnsgrepToken = viper.GetStringMapString("dnsgrep")["dnsgreptoken"]
+	conf.HunterApiKey = viper.GetStringMapString("hunter")["hunterapikey"]
 
 	return conf
 }

@@ -22,13 +22,19 @@ func NewRunner(options *utils.Options) *Runner {
 
 func (r *Runner) check() (api.Apier, error) {
 	var apiObj api.Apier
+
+	// TODO
+	// When you add new api, add the entry
 	switch r.options.SearchType {
 	case "QuakeSearch":
 		apiObj = api.NewQuake(r.conf.QuakeToken, r.options.Num)
+	case "HunterSearch":
+		apiObj = api.NewHunter(r.conf.HunterApiKey, r.options.Num)
 		//case "fofa":
 		//	apiObj = api.NewFofa(r.conf.FofaEmail, r.conf.FofaToken)
 		//case "dnsgrep":
 		//	apiObj = api.NewDsnGrep(r.conf.DnsgrepToken)
+
 	}
 	ok := apiObj.Auth()
 	if ok {

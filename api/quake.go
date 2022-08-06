@@ -15,14 +15,14 @@ type IPLists []string
 
 type Quake struct {
 	Token string
-	*SearchFiled
+	*QuakeSearchFiled
 }
 
 // NewQuake construct of Quake struct
 func NewQuake(token string, num int) *Quake {
 	return &Quake{
-		Token:       token,
-		SearchFiled: NewQuakeSearchFiled("", num),
+		Token:            token,
+		QuakeSearchFiled: NewQuakeSearchFiled("", num),
 	}
 }
 
@@ -43,11 +43,11 @@ func (q *Quake) Auth() bool {
 func (q *Quake) search(search string) IPLists {
 	var iplist IPLists
 	INFOURL := "https://quake.360.cn/api/v3/search/quake_service"
-	q.SearchFiled.Query = search
-	fmt.Printf("%v\n", q.SearchFiled)
+	q.QuakeSearchFiled.Query = search
+	fmt.Printf("%v\n", q.QuakeSearchFiled)
 	//os.Exit(0)
 
-	body, err := json.Marshal(q.SearchFiled)
+	body, err := json.Marshal(q.QuakeSearchFiled)
 	if err != nil {
 		Logs.Error.Println("[-] Unmarshal quake search parameters Error")
 	}
@@ -60,7 +60,7 @@ func (q *Quake) search(search string) IPLists {
 	fmt.Println(resp.StringBody)
 
 	value, _ := resp.ApiResults.(*QuakeSearchResult)
-	fmt.Println(value.Message)
+	//fmt.Println(value.Message)
 	for _, item := range value.Data {
 		var ip, host string
 		switch item.Port {
@@ -100,8 +100,8 @@ func (q *Quake) search(search string) IPLists {
 	return iplist
 }
 
-// SearchFiled quake query interface parameters
-type SearchFiled struct {
+// QuakeSearchFiled quake query interface parameters
+type QuakeSearchFiled struct {
 	Query       string      `json:"query"` // Query sentence
 	Start       int         `json:"start"` // Paging start
 	Size        int         `json:"size"`  // Paging Size
@@ -111,9 +111,9 @@ type SearchFiled struct {
 	Include     []string    `json:"include""`   //Containing fields
 }
 
-// NewQuakeSearchFiled construct of SearchFiled struct
-func NewQuakeSearchFiled(query string, size int) *SearchFiled {
-	return &SearchFiled{
+// NewQuakeSearchFiled construct of QuakeSearchFiled struct
+func NewQuakeSearchFiled(query string, size int) *QuakeSearchFiled {
+	return &QuakeSearchFiled{
 		Query:       query,
 		Start:       0,
 		Size:        size,

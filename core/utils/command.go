@@ -9,6 +9,7 @@ type Options struct {
 	FofaSearch    string // fofa query string
 	QuakeSearch   string // quake query string
 	DnsgrepSearch string // dnsgrep query string
+	HunterSearch  string // hunter query string
 	SearchString  string
 	Url           string // target url
 	Filename      string // target url with file
@@ -48,6 +49,7 @@ func ParseOptions() *Options {
 		flagSet.StringVarP(&options.FofaSearch, "fofasearch", "sfo", "", "Use fofa api to search"),
 		flagSet.StringVarP(&options.QuakeSearch, "quakesearch", "squ", "", "Use quake api to search"),
 		flagSet.StringVarP(&options.DnsgrepSearch, "dnsgrepsearch", "sdg", "", "Use dnsgrep api to search"),
+		flagSet.StringVarP(&options.HunterSearch, "huntersearch", "shu", "", "Use hunter api to search"),
 		flagSet.IntVarP(&options.Num, "number", "num", 30, "Query data quantity "),
 	)
 
@@ -72,6 +74,9 @@ func ParseOptions() *Options {
 	} else if options.DnsgrepSearch != "" {
 		options.SearchType = "DnsgrepSearch"
 		options.SearchString = options.DnsgrepSearch
+	} else if options.HunterSearch != "" {
+		options.SearchType = "HunterSearch"
+		options.SearchString = options.HunterSearch
 	}
 
 	return options
