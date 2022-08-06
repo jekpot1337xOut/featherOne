@@ -1,0 +1,4 @@
+.idea/
+*.exe
+*/*_test.go
+*/*.backup
