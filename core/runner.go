@@ -3,7 +3,7 @@ package core
 import (
 	"errors"
 	"os"
-	
+
 	"featherOne/api"
 	"featherOne/conf"
 	"featherOne/core/utils"
@@ -30,20 +30,22 @@ func (r *Runner) check() error {
 	var apiObj api.Apier
 	if r.options.SearchString != "" {
 		if r.options.QuakeSearch {
+			gologger.Info().Msgf("Check quake authorization,wait a second... ")
 			apiObj = api.NewQuake(r.conf.QuakeToken, r.options.Num)
 			if ok := apiObj.Auth(); !ok {
 				return api.NewApiError("Quake")
 			}
-			r.readyHunter = apiObj
-		}
-		if r.options.HunterSearch {
+			r.readyQuake = apiObj
+		} else if r.options.HunterSearch {
+			gologger.Info().Msgf("Check hunter authorization,wait a second...\n")
 			apiObj = api.NewHunter(r.conf.HunterApiKey, r.options.Num)
 			if ok := apiObj.Auth(); !ok {
 				return api.NewApiError("Hunuter")
 			}
 			r.readyHunter = apiObj
+		} else {
+			return errors.New("please choose a search engine")
 		}
-		return errors.New("please choose a search engine")
 	}
 	return nil
 }
@@ -54,20 +56,21 @@ func (r *Runner) Search() {
 
 	err := r.check()
 	if err != nil {
-		gologger.Error().Msgf("Api auth err :%s", err)
+		gologger.Error().Msgf("Api auth err :%s\n", err)
 		os.Exit(0)
 	}
 
+	gologger.Info().Msgf("Search grammar is: %s\n", r.options.SearchString)
+	
+	// TODO
+	// add new sentence if you add new api
 	if r.readyQuake != nil {
+		gologger.Info().Msg("Searching data via quake...")
 		result := api.Search(r.readyQuake, r.options.SearchString)
 		tmpDomain = append(tmpDomain, result...)
 	}
 	if r.readyHunter != nil {
-		result := api.Search(r.readyQuake, r.options.SearchString)
-		tmpDomain = append(tmpDomain, result...)
-	}
-	if r.readyHunter != nil {
-		result := api.Search(r.readyQuake, r.options.SearchString)
+		result := api.Search(r.readyHunter, r.options.SearchString)
 		tmpDomain = append(tmpDomain, result...)
 	}
 
