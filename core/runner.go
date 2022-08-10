@@ -1,16 +1,20 @@
 package core
 
 import (
+	"errors"
 	"featherOne/api"
 	"featherOne/conf"
 	"featherOne/core/utils"
-	"fmt"
+	"github.com/projectdiscovery/gologger"
 	"os"
 )
 
 type Runner struct {
-	options *utils.Options
-	conf    *conf.Conf
+	options     *utils.Options
+	conf        *conf.Conf
+	readyFofa   api.Apier
+	readyQuake  api.Apier
+	readyHunter api.Apier
 }
 
 func NewRunner(options *utils.Options) *Runner {
@@ -20,55 +24,88 @@ func NewRunner(options *utils.Options) *Runner {
 	}
 }
 
-func (r *Runner) check() (api.Apier, error) {
+func (r *Runner) check() error {
 	var apiObj api.Apier
-
-	// TODO
-	// When you add new api, add the entry
-	switch r.options.SearchType {
-	case "QuakeSearch":
-		apiObj = api.NewQuake(r.conf.QuakeToken, r.options.Num)
-	case "HunterSearch":
-		apiObj = api.NewHunter(r.conf.HunterApiKey, r.options.Num)
-		//case "fofa":
-		//	apiObj = api.NewFofa(r.conf.FofaEmail, r.conf.FofaToken)
-		//case "dnsgrep":
-		//	apiObj = api.NewDsnGrep(r.conf.DnsgrepToken)
-
+	if r.options.SearchString != "" {
+		if r.options.QuakeSearch {
+			apiObj = api.NewQuake(r.conf.QuakeToken, r.options.Num)
+			if ok := apiObj.Auth(); !ok {
+				return api.NewApiError("Quake")
+			}
+			r.readyHunter = apiObj
+		}
+		if r.options.HunterSearch {
+			apiObj = api.NewHunter(r.conf.HunterApiKey, r.options.Num)
+			if ok := apiObj.Auth(); !ok {
+				return api.NewApiError("Hunuter")
+			}
+			r.readyHunter = apiObj
+		}
+		return errors.New("please choose a search engine")
 	}
-	ok := apiObj.Auth()
-	if ok {
-		return apiObj, nil
-	}
-	return nil, api.NewApiError(r.options.SearchType)
+	return nil
 }
 
 func (r *Runner) Search() {
-	apiObj, err := r.check()
+	var resultDomain api.IPLists
+	var tmpDomain api.IPLists
+
+	err := r.check()
 	if err != nil {
-		fmt.Println("Api auth err :", err)
+		gologger.Error().Msgf("Api auth err :%s", err)
 		os.Exit(0)
 	}
 
-	result := api.Search(apiObj, r.options.SearchString)
+	if r.readyQuake != nil {
+		result := api.Search(r.readyQuake, r.options.SearchString)
+		tmpDomain = append(tmpDomain, result...)
+	}
+	if r.readyHunter != nil {
+		result := api.Search(r.readyQuake, r.options.SearchString)
+		tmpDomain = append(tmpDomain, result...)
+	}
+	if r.readyHunter != nil {
+		result := api.Search(r.readyQuake, r.options.SearchString)
+		tmpDomain = append(tmpDomain, result...)
+	}
 
-	var UniqueResult []string
+	if r.options.SameIp {
+		result := api.SearchSip(r.options.Url)
+		tmpDomain = append(tmpDomain, result...)
+	}
+	if r.options.Ip {
+		result := api.SearchIp(r.options.Url)
+		gologger.Silent().Msg(result)
+		return
+	}
+	if r.options.Weight {
+		w, err := api.SearchWeight(r.options.Url)
+		if err != nil {
+			gologger.Error().Msgf("%s", err)
+			return
+		}
+		gologger.Silent().Msgf("%s baidu' weight is %v", r.options.Url, w)
+		return
+	}
+
+	// Unique results
 	tmpList := make(map[string]int)
-
-	for _, item := range result {
+	for _, item := range tmpDomain {
 		if item == "" {
 			continue
 		}
 		if _, ok := tmpList[item]; !ok {
-			UniqueResult = append(UniqueResult, item)
+			gologger.Silent().Msg(item)
+			resultDomain = append(resultDomain, item)
 			tmpList[item] = 1
 		}
 	}
 
-	//UniqueResult := []string{"http://lx1.xhu.edu.cn", "http://cmamt15.xhu.edu.cn", "http://scsz.xhu.edu.cn", "http://jwc.xhu.edu.cn", "https://panabityjdw.xhu.edu.cn", "http://face.xhu.edu.cn", "https://2022-ieeeicassp-org-s.tsgvpn.xhu.edu.cn", "https://chem-cnki-net-s.tsgvpn.xhu.edu.cn", "https://xt-cnki-net-s.tsgvpn.xhu.edu.cn", "https://202-115-153-140-8001-p.tsgvpn.xhu.edu.cn", "https://xdyy-cnki-net-s.tsgvpn.xhu.edu.cn", "https://t-go-sohu-com.tsgvpn.xhu.edu.cn", "https://data-cnki-net-s.tsgvpn.xhu.edu.cn", "https://news-xhu-edu-cn.tsgvpn.xhu.edu.cn", "https://hypt02-cnki-net-s.tsgvpn.xhu.edu.cn", "https://groupyd-chaoxing-com-s.tsgvpn.xhu.edu.cn", "https://cxjc-cnki-net-s.tsgvpn.xhu.edu.cn", "https://esi-help-clarivate-com.tsgvpn.xhu.edu.cn", "https://www-ieee--jas-net.tsgvpn.xhu.edu.cn", "http://tsgvpn.xhu.edu.cn:8118", "http://cxcyxy.xhu.edu.cn", "http://global.xhu.edu.cn", "https://face.xhu.edu.cn", "http://zzb.xhu.edu.cn", "http://jw.xhu.edu.cn", "http://nmc.xhu.edu.cn", "http://finance.xhu.edu.cn", "http://shfz.xhu.edu.cn", "http://energy.xhu.edu.cn", "http://zb.xhu.edu.cn"}
-	fmt.Println("Total target url number is: ", len(UniqueResult))
+	gologger.Info().Msgf("Total target url number is %v\n", len(resultDomain))
 
-	pool := utils.NewPool(UniqueResult)
-	pool.Start()
+	//if !r.options.Silent {
+	//	pool := utils.NewPool(resultDomain)
+	//	pool.Start()
+	//}
 
 }

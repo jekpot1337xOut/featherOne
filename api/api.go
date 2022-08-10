@@ -33,8 +33,25 @@ func Search(apier Apier, searchString string) IPLists {
 	return iplist
 }
 
-// Auth TODO
-// complete function
-func Auth(searchType string) (Apier, error) {
-	return nil, nil
+func SearchIp(s string) string {
+	ip := webScan{}.searchIP(s)
+	return ip
+}
+
+func SearchSip(s string) IPLists {
+	var sameIpResult IPLists
+	tmpSip := webScan{}.searchSip(s)
+	sameIpResult = append(sameIpResult, tmpSip...)
+	tmpSip = rapidDns{}.searchSip(s)
+	sameIpResult = append(sameIpResult, tmpSip...)
+	return sameIpResult
+}
+
+// SearchWeight search weight entry
+func SearchWeight(s string) (int, error) {
+	w, err := aizhan{}.searchWeight(s)
+	if err != nil {
+		return -1, nil
+	}
+	return w, nil
 }

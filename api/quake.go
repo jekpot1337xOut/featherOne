@@ -35,7 +35,6 @@ func (q *Quake) Auth() bool {
 	if !strings.Contains(resp.Entry.StringBody, "Successful") {
 		return false
 	}
-	//fmt.Println(resp.Entry.StringBody)
 	return true
 }
 
@@ -44,8 +43,6 @@ func (q *Quake) search(search string) IPLists {
 	var iplist IPLists
 	INFOURL := "https://quake.360.cn/api/v3/search/quake_service"
 	q.QuakeSearchFiled.Query = search
-	fmt.Printf("%v\n", q.QuakeSearchFiled)
-	//os.Exit(0)
 
 	body, err := json.Marshal(q.QuakeSearchFiled)
 	if err != nil {
@@ -57,10 +54,8 @@ func (q *Quake) search(search string) IPLists {
 	request.SetHeader("Content-Type", "application/json")
 	request.UnmarshalResp(NewQuakeSearchResult())
 	resp := request.Do()
-	fmt.Println(resp.StringBody)
 
 	value, _ := resp.ApiResults.(*QuakeSearchResult)
-	//fmt.Println(value.Message)
 	for _, item := range value.Data {
 		var ip, host string
 		switch item.Port {
@@ -95,8 +90,6 @@ func (q *Quake) search(search string) IPLists {
 		}
 	}
 
-	fmt.Printf("%#v\n", iplist)
-	fmt.Println("搜索结果的数量为： ", len(iplist))
 	return iplist
 }
 

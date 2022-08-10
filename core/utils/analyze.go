@@ -2,8 +2,8 @@ package utils
 
 import (
 	"encoding/json"
-	"featherOne/Logs"
 	"fmt"
+	"github.com/projectdiscovery/gologger"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -33,14 +33,14 @@ type Analyze struct {
 func ParseResp(r *Response, response *http.Response) *Response {
 	defer func() {
 		if recover() != nil {
-			fmt.Println("search grammar err.Please check and run again")
+			gologger.Error().Msg("search grammar err.Please check and run again")
 			os.Exit(0)
 		}
 	}()
 
 	rawResponse, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		Logs.Error.Println("[-] Read raw body content Error")
+		gologger.Error().Msg("Read raw body content Error")
 		return nil
 	}
 	r.Entry.RawBody = rawResponse
@@ -51,8 +51,8 @@ func ParseResp(r *Response, response *http.Response) *Response {
 	if r.ApiResults != nil {
 		err = json.Unmarshal(r.Entry.RawBody, r.ApiResults)
 		if err != nil {
-			Logs.Error.Println("[-] Unmarshal api result Error")
 			r.ApiResults = nil
+			gologger.Error().Msg("Unmarshal api result Error")
 		}
 	}
 	return r
@@ -61,17 +61,23 @@ func ParseResp(r *Response, response *http.Response) *Response {
 // getTitle extract Title from response body
 func getTitle(s string) string {
 	reg := regexp.MustCompile(`<title>(.*?)</title>`)
-	if reg == nil {
-		fmt.Println("Regexp to extract Title errored :", reg)
-		return ""
+	t := reg.FindStringSubmatch(s)
+	if len(t) > 0 {
+		return t[1]
 	}
-	title := reg.FindString(s)
-	//return title[8 : len(title)-8]
-	return title
+	return ""
 }
 
+// fixUrl fix url if it's a domain format
+func fixUrl(s string) string {
+	if !strings.HasPrefix(s, "http") {
+		return fmt.Sprintf("http://%s", s)
+	}
+	return s
+}
+
+// colorOut  output with color
 func colorOut(resp *Response) {
-	fmt.Println(resp.URL, resp.Title)
 	if resp.StatusCode == 200 {
 		lowerTitle := strings.ToLower(resp.Title)
 		for _, keyword := range KEYWORDS {

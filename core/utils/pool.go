@@ -27,6 +27,7 @@ func NewPool(targetIPList []string) *Pool {
 // Start entry of download pool
 func (p *Pool) Start() {
 	for _, targetIP := range p.targetIPList {
+		targetIP = fixUrl(targetIP)
 		p.reqChan <- NewRequest("GET", targetIP, nil)
 	}
 	close(p.reqChan)
