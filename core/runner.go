@@ -2,11 +2,13 @@ package core
 
 import (
 	"errors"
+	"os"
+	
 	"featherOne/api"
 	"featherOne/conf"
 	"featherOne/core/utils"
+
 	"github.com/projectdiscovery/gologger"
-	"os"
 )
 
 type Runner struct {

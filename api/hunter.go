@@ -2,11 +2,12 @@ package api
 
 import (
 	"encoding/base64"
-	"featherOne/core/utils"
 	"fmt"
 	"strconv"
 	"strings"
 	"time"
+
+	"featherOne/core/utils"
 )
 
 type Hunter struct {

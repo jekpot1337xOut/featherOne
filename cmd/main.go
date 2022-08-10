@@ -1,10 +1,12 @@
 package main
 
 import (
+	"time"
+
 	"featherOne/core"
 	"featherOne/core/utils"
+	
 	"github.com/projectdiscovery/gologger"
-	"time"
 )
 
 func main() {

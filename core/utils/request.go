@@ -2,10 +2,11 @@ package utils
 
 import (
 	"crypto/tls"
-	"featherOne/Logs"
 	"io"
 	"net/http"
 	"time"
+
+	"featherOne/Logs"
 )
 
 type Request struct {

@@ -3,12 +3,14 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"featherOne/Logs"
-	"featherOne/core/utils"
 	"fmt"
 	"strconv"
 	"strings"
 	"time"
+
+	"featherOne/core/utils"
+
+	"github.com/projectdiscovery/gologger"
 )
 
 type IPLists []string
@@ -46,7 +48,7 @@ func (q *Quake) search(search string) IPLists {
 
 	body, err := json.Marshal(q.QuakeSearchFiled)
 	if err != nil {
-		Logs.Error.Println("[-] Unmarshal quake search parameters Error")
+		gologger.Error().Msg("Unmarshal quake search parameters Error")
 	}
 	readerBody := bytes.NewBuffer(body)
 	request := utils.NewRequest("POST", INFOURL, readerBody)

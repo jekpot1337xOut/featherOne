@@ -1,10 +1,11 @@
 package api
 
 import (
-	"featherOne/core/utils"
 	"fmt"
 	"regexp"
 	"strings"
+
+	"featherOne/core/utils"
 )
 
 // https://rapiddns.io/

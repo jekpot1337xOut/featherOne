@@ -1,8 +1,9 @@
 package api
 
 import (
-	"featherOne/core/utils"
 	"fmt"
+
+	"featherOne/core/utils"
 )
 
 // https://www.webscan.cc/api/
