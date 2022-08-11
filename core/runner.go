@@ -120,9 +120,9 @@ func (r *Runner) Search() {
 
 	gologger.Info().Msgf("Total target url number is %v\n", len(resultDomain))
 
-	//if !r.options.Silent {
-	//	pool := utils.NewPool(resultDomain)
-	//	pool.Start()
-	//}
+	if r.options.Probe {
+		pool := utils.NewPool(resultDomain)
+		pool.Start()
+	}
 
 }

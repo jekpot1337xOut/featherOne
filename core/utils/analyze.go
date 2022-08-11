@@ -13,9 +13,10 @@ import (
 )
 
 const (
-	RED   = "\033[1;31;40m"
-	GREEN = "\033[1;32;40m"
-	END   = "\033[0m"
+	RED    = "\033[1;31;40m"
+	GREEN  = "\033[1;32;40m"
+	Yellow = "\033[1;33;40m"
+	END    = "\033[0m"
 )
 
 var KEYWORDS = []string{"系统", "管理", "登录", "后台", "login"}
@@ -79,12 +80,16 @@ func fixUrl(s string) string {
 
 // colorOut  output with color
 func colorOut(resp *Response) {
-	if resp.StatusCode == 200 {
+	if 200 <= resp.StatusCode && resp.StatusCode < 300 {
 		lowerTitle := strings.ToLower(resp.Title)
 		for _, keyword := range KEYWORDS {
 			if strings.Contains(lowerTitle, keyword) {
-				fmt.Printf("%s[+] URL: %20s  StatusCode: %d %sTitle: %s %s\n", GREEN, resp.URL, resp.StatusCode, RED, resp.Title, END)
+				gologger.Print().Label("++").Msgf("%sURL: %20s  StatusCode: %d %sTitle: %s %s\n", GREEN, resp.URL, resp.StatusCode, RED, resp.Title, END)
 			}
 		}
+	} else if 300 <= resp.StatusCode && resp.StatusCode < 400 {
+		gologger.Print().Label("+").Msgf("%sURL: %20s  StatusCode: %d %s\n", Yellow, resp.URL, resp.StatusCode, END)
+	} else {
+		gologger.Print().Label("-").Msgf("URL: %20s  StatusCode: %d \n", resp.URL, resp.StatusCode)
 	}
 }

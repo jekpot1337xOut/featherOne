@@ -26,6 +26,7 @@ type Options struct {
 	Subdomain string // integrate subdomain module
 
 	Silent bool // show more info or only subdomain
+	Probe  bool
 }
 
 func showBanner() {
@@ -74,6 +75,7 @@ func ParseOptions() *Options {
 
 	flagSet.CreateGroup("mode", "Mode",
 		flagSet.BoolVar(&options.Silent, "silent", false, "Show subdomain or ip only"),
+		flagSet.BoolVar(&options.Probe, "probe", false, "simple probe to get statusCode and title"),
 	)
 
 	flagSet.Parse()
