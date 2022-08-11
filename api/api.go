@@ -2,6 +2,8 @@ package api
 
 import (
 	"fmt"
+
+	"github.com/projectdiscovery/gologger"
 )
 
 type Apier interface {
@@ -54,4 +56,23 @@ func SearchWeight(s string) (int, error) {
 		return -1, nil
 	}
 	return w, nil
+}
+
+func AutoGrammer(s, sT string) string {
+	switch sT {
+	case "quake":
+		result, err := toQuakeGrammar(s)
+		if err != nil {
+			gologger.Error().Msg(err.Error())
+		}
+		return result
+	case "hunter":
+		result, err := toHunterGrammer(s)
+		if err != nil {
+			gologger.Error().Msg(err.Error())
+		}
+		return result
+	default:
+		return ""
+	}
 }

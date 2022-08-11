@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"featherOne/Logs"
+	"github.com/projectdiscovery/gologger"
 )
 
 type Request struct {
@@ -42,7 +42,7 @@ func (r *Request) Do() *Response {
 
 	tmpResp, err := client.Do(r.Request)
 	if err != nil {
-		Logs.Error.Println(err)
+		gologger.Error().Msgf("%s\n", err)
 	}
 	defer tmpResp.Body.Close()
 

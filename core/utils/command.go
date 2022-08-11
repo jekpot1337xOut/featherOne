@@ -12,10 +12,10 @@ type Options struct {
 	HunterSearch  bool   // hunter query string
 	DnsgrepSearch string // dnsgrep query string
 	SearchString  string // search grammar
+	AutoGrammar   bool
 	Url           string // target url
 	Filename      string // target url with file
 	IpAddress     string // target ip address
-	SearchType    string // which cyberspace you choose to use
 	Num           int    // query data number
 	TreadNum      int    // pool thread number
 
@@ -59,6 +59,7 @@ func ParseOptions() *Options {
 		flagSet.BoolVarP(&options.QuakeSearch, "quake", "squ", false, "Use quake api to search"),
 		flagSet.BoolVarP(&options.HunterSearch, "hunter", "shu", false, "Use hunter api to search"),
 		flagSet.IntVarP(&options.Num, "number", "num", 30, "Query data quantity "),
+		flagSet.BoolVarP(&options.AutoGrammar, "autogrammar", "autog", false, "parse search into corresponding engine grammar"),
 	)
 
 	flagSet.CreateGroup("ipinfo", "Ipinfo",
@@ -67,9 +68,10 @@ func ParseOptions() *Options {
 		flagSet.BoolVarP(&options.Weight, "weight", "wgt", false, "search weight"),
 	)
 
-	flagSet.CreateGroup("integrate", "Integrate",
-		flagSet.StringVar(&options.Subdomain, "subdomain", "", "Built-in integration subdomain module"),
-	)
+	//flagSet.CreateGroup("integrate", "Integrate",
+	//	flagSet.StringVar(&options.Subdomain, "subdomain", "", "Built-in integration subdomain module"),
+	//)
+
 	flagSet.CreateGroup("mode", "Mode",
 		flagSet.BoolVar(&options.Silent, "silent", false, "Show subdomain or ip only"),
 	)

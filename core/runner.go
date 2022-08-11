@@ -61,29 +61,41 @@ func (r *Runner) Search() {
 	}
 
 	gologger.Info().Msgf("Search grammar is: %s\n", r.options.SearchString)
-	
+
 	// TODO
 	// add new sentence if you add new api
 	if r.readyQuake != nil {
 		gologger.Info().Msg("Searching data via quake...")
+		if r.options.AutoGrammar {
+			r.options.SearchString = api.AutoGrammer(r.options.SearchString, "quake")
+			gologger.Info().Msgf("transfer grammar is %s\n", r.options.SearchString)
+		}
 		result := api.Search(r.readyQuake, r.options.SearchString)
 		tmpDomain = append(tmpDomain, result...)
 	}
 	if r.readyHunter != nil {
+		gologger.Info().Msg("Searching data via hunter...")
+		if r.options.AutoGrammar {
+			r.options.SearchString = api.AutoGrammer(r.options.SearchString, "hunter")
+			gologger.Info().Msgf("transfer grammar is %s\n", r.options.SearchString)
+		}
 		result := api.Search(r.readyHunter, r.options.SearchString)
 		tmpDomain = append(tmpDomain, result...)
 	}
 
 	if r.options.SameIp {
+		gologger.Info().Msg("Searching same ip...")
 		result := api.SearchSip(r.options.Url)
 		tmpDomain = append(tmpDomain, result...)
 	}
 	if r.options.Ip {
+		gologger.Info().Msg("Searching ip...")
 		result := api.SearchIp(r.options.Url)
 		gologger.Silent().Msg(result)
 		return
 	}
 	if r.options.Weight {
+		gologger.Info().Msg("Searching weight...")
 		w, err := api.SearchWeight(r.options.Url)
 		if err != nil {
 			gologger.Error().Msgf("%s", err)

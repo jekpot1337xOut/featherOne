@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -158,7 +159,26 @@ func NewHunterSearchResult() *HunterSearchResult {
 
 // fixHunterSearchString fix search string
 func fixHunterSearchString(s string) string {
-	splitSlice := strings.Split("domain=xhu.edu.cn", "=")
+	splitSlice := strings.Split(s, "=")
 	fixString := fmt.Sprintf(`%s="%s"`, splitSlice[0], splitSlice[1])
 	return fixString
+}
+
+func toHunterGrammer(s string) (string, error) {
+	keywords := strings.Split(s, ":")
+	keyword, search := keywords[0], keywords[1]
+	switch keyword {
+	case "ip":
+		return fmt.Sprintf("ip=%s", search), nil
+	case "domain":
+		return fmt.Sprintf("domain=%s", search), nil
+	case "header":
+		return fmt.Sprintf("header=%s", search), nil
+	case "favicon":
+		return fmt.Sprintf("web.icon=%s", search), nil
+	case "cert":
+		return fmt.Sprintf("cert=%s", search), nil
+	default:
+		return "", errors.New("transfer to hunter grammar false")
+	}
 }

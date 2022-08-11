@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -64,7 +65,7 @@ func (q *Quake) search(search string) IPLists {
 		case 80:
 			ip = fmt.Sprintf("http://%s", item.Ip)
 			host = func(s string) string {
-				if host != "" {
+				if s != "" {
 					return fmt.Sprintf("http://%s", s)
 				}
 				return ""
@@ -72,7 +73,7 @@ func (q *Quake) search(search string) IPLists {
 		case 443:
 			ip = fmt.Sprintf("https://%s", item.Ip)
 			host = func(s string) string {
-				if host != "" {
+				if s != "" {
 					return fmt.Sprintf("https://%s", s)
 				}
 				return ""
@@ -80,7 +81,7 @@ func (q *Quake) search(search string) IPLists {
 		default:
 			ip = fmt.Sprintf("http://%s:%d", item.Ip, item.Port)
 			host = func(s string) string {
-				if host != "" {
+				if s != "" {
 					return fmt.Sprintf("http://%s:%d", s, item.Port)
 				}
 				return ""
@@ -145,4 +146,23 @@ type QuakeSearchResult struct {
 // NewQuakeSearchResult construct of QuakeSearchResult struct
 func NewQuakeSearchResult() *QuakeSearchResult {
 	return &QuakeSearchResult{}
+}
+
+func toQuakeGrammar(s string) (string, error) {
+	keywords := strings.Split(s, ":")
+	keyword, search := keywords[0], keywords[1]
+	switch keyword {
+	case "ip":
+		return fmt.Sprintf("ip: %s", search), nil
+	case "domain":
+		return fmt.Sprintf("domain: %s", search), nil
+	case "header":
+		return fmt.Sprintf("headers: %s", search), nil
+	case "favicon":
+		return fmt.Sprintf("favicon: %s", search), nil
+	case "cert":
+		return fmt.Sprintf("cert: %s", search), nil
+	default:
+		return "", errors.New("transfer to quake grammar false")
+	}
 }
