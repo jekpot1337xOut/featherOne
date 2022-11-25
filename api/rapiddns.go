@@ -26,7 +26,7 @@ func (rapidDns) searchSip(s string) IPLists {
 // searchSubdomain search subdomain via  rapiddns
 func (rapidDns) searchSubdomain(s string) IPLists {
 	var subdomainList IPLists
-	INFOURL := fmt.Sprintf("https://rapiddns.io/subdomain/%s?full=1#result", s)
+	INFOURL := fmt.Sprintf("http://api.scrape.do/?token=ad3d00b0025842afb0f1620cf7f3301dd3ddcc23d1a&url=https://rapiddns.io/subdomain/%s?full=1#result", s)
 	req := utils.NewRequest("GET", INFOURL, nil)
 	resp := req.Do()
 
